@@ -1,6 +1,7 @@
 import pandas as pd
 from selenium import webdriver
 from bs4 import BeautifulSoup
+from selenium.webdriver.common.keys import Keys
 from datetime import datetime
 import time
 
@@ -17,6 +18,8 @@ lsat_height = driver.execute_script(
     "return document.documentElement.scrollHeight")
 
 last_element = []
+video_url_list = []
+
 while True:
     driver.execute_script(
         "window.scrollTo(0,document.documentElement.scrollHeight);")
@@ -28,13 +31,25 @@ while True:
     video_data = soup.find_all(
         'ytd-grid-video-renderer', {'class': 'style-scope ytd-grid-renderer'})
 
-    video_url_list = []
-    for i in range(len(video_data)):
+    # for i in range(len(video_data)):
+    #     url = youtube_url + \
+    #         video_data[i].find('a', {'id': 'thumbnail'})['href']
+    #     video_url_list.append(url)
 
+    for i in range(5):
+        name = video_data[i].find('a', {'id': 'video-title'}).text
         url = youtube_url + \
             video_data[i].find('a', {'id': 'thumbnail'})['href']
-        video_url_list.append(url)
-    print(video_url_list)
+        driver.get(url)
 
-    dataframe = pd.DataFrame(
-        {'name': [], 'view_count': [], 'youtube_url': [], 'date': [], 'desc': []})
+        time.sleep(3)
+
+        each_page = driver.page_source
+        each_soup = BeautifulSoup(each_page, 'lxml')
+
+        try:
+            container = each_soup.find(
+                'span', {'class': 'view-count style-scope ytd-video-view-count-renderer'}).string
+            print(name, container)
+        except:
+            print(name, "short")
