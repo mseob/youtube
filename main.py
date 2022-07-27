@@ -65,7 +65,8 @@ def getVideoDetail(video_data):
         # 조회수
         temp_view = each_soup.find(
             'span', {'class': 'view-count style-scope ytd-video-view-count-renderer'}).string
-        view = temp_view.replace('조회수 ', '').replace('회', '')
+        view = temp_view.replace('조회수 ', '').replace('회', '').replace(',', '')
+        view = int(view)
         # 좋아요
         temp_like = each_soup.find_all(
             'yt-formatted-string', {'id': 'text'})
