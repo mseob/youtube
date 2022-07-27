@@ -2,16 +2,29 @@ import pandas as pd
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import time
+import math
 
-channel = "https://www.youtube.com/channel/UCHt_gfJhwWgFPE1HtG1Y-hA/videos"
-youtube_url = "https://www.youtube.com"
-
+# https://www.youtube.com/channel/UCHt_gfJhwWgFPE1HtG1Y-hA
+channel_videos = "/videos"
 driver = webdriver.Chrome()
-driver.maximize_window()
-driver.get(channel)
 
-last_element = []
-video_url_list = []
+
+def getChannelInfo():
+    print("Input Youtube URL.")
+    channel = input('Channel : ')
+    print("Input Video counts. ")
+    videos = int(input('Videos : '))
+    countNum = math.ceil(videos / 30)
+    openYoutube(channel)
+
+
+def openYoutube(channel):
+    channel = channel + channel_videos
+    driver.maximize_window()
+    driver.get(channel)
+
+
+getChannelInfo()
 
 
 def main():
