@@ -5,33 +5,30 @@ import time
 import math
 
 # https://www.youtube.com/channel/UCHt_gfJhwWgFPE1HtG1Y-hA
-channel_videos = "/videos"
 driver = webdriver.Chrome()
 
 
 def getChannelInfo():
     print("Input Youtube URL.")
-    channel = input('Channel : ')
+    channel = input('Channel : ') + "/videos"
     print("Input Video counts. ")
     videos = int(input('Videos : '))
     countNum = math.ceil(videos / 30)
-    openYoutube(channel)
+    openYoutube(channel, countNum)
 
 
-def openYoutube(channel):
-    channel = channel + channel_videos
+def openYoutube(channel, countNum):
     driver.maximize_window()
     driver.get(channel)
+    scrollVideoPage(countNum)
 
 
-getChannelInfo()
-
-
-def main():
+def scrollVideoPage(countNum):
+    print(f"스크롤 수 : {countNum}")
 
     # 스크롤 내리기 => 한 번 당 영상 30개
     j = 0
-    while j <= 13:
+    while j <= countNum:
         driver.execute_script(
             "window.scrollTo(0,document.documentElement.scrollHeight);")
         time.sleep(1)
@@ -40,16 +37,15 @@ def main():
     soup = BeautifulSoup(page, 'lxml')
     video_data = soup.find_all(
         'ytd-grid-video-renderer', {'class': 'style-scope ytd-grid-renderer'})
-    print('start crawling')
-    getInfo(video_data)
+    getVideoDetail(video_data)
 
 
-def getInfo(video_data):
+def getVideoDetail(video_data):
+    youtube_url = "https://www.youtube.com"
     contentList = []
 
-    print("let's go")
     for i in range(len(video_data)):
-        if i % 10 == 0:
+        if i % 10 == 0 and i != 0:
             print('휴식')
             time.sleep(4)
         # 동영상 제목, 개별 URL
@@ -65,7 +61,7 @@ def getInfo(video_data):
         time.sleep(0.5)
         each_page = driver.page_source
         each_soup = BeautifulSoup(each_page, 'lxml')
-        print(f'정보 수집 중 {i+1} / {len(video_data)}')
+        print(f'정보 수집 중 {i+1} / {len(video_data)+1}')
         # 조회수
         temp_view = each_soup.find(
             'span', {'class': 'view-count style-scope ytd-video-view-count-renderer'}).string
@@ -87,3 +83,6 @@ def getInfo(video_data):
             contentList = pd.DataFrame(contentList)
             contentList.to_excel('youtube.xlsx')
             break
+
+
+getChannelInfo()
